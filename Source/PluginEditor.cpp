@@ -347,7 +347,7 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
     leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
     
     g.setColour(Colours::skyblue);
-    g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));//???figure this out and why it isn't following the curve
+    g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));//???figure this out and why it isn't following the curve, but right is
     
     auto rightChannelFFTPath = rightPathProducer.getPath();
     //translating the rightChannel path to follow the responseArea
