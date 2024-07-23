@@ -73,14 +73,14 @@ void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggle
 //    g.setColour(Colours::red);
 //    g.drawRect(bounds);
     
-    auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;//can use juce linve constant to tweak it
+    auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;//JUCE_LIVE_CONSTANT(6);//can use juce live constant to tweak it
     auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
     
-    float ang = 30.f;
+    float ang = 40.f;//JUCE_LIVE_CONSTANT(30);//determines how big top gap is in the arc
     
-    size -= 6;
+    size -= 8;//JUCE_LIVE_CONSTANT(6);//changes inner arc
     
-    powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(30.f), degreesToRadians(360.f - ang), true);//using ang to adjust how visuals look
+    powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(ang), degreesToRadians(360.f - ang), true);//using ang to adjust how visuals look
     
     powerButton.startNewSubPath(r.getCentreX(), r.getY());
     powerButton.lineTo(r.getCentre());
