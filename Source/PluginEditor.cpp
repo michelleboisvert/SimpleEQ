@@ -15,10 +15,12 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
     
     auto bounds = Rectangle<float>(x, y, width, height);
     
-    g.setColour(Colour(62u, 90u, 142u));
+    auto enabled = slider.isEnabled();
+    
+    g.setColour(enabled ? Colour(62u, 90u, 142u) : Colours::darkgrey);//???adjust
     g.fillEllipse(bounds);
     
-    g.setColour(Colour(11u, 39u, 91u));
+    g.setColour(enabled ? Colour(11u, 39u, 91u) : Colours::grey);//??adjust
     g.drawEllipse(bounds, 2.f);
     
     
@@ -28,7 +30,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
         auto center = bounds.getCentre();
         Path p;
         
-        g.setColour(Colours::white);
+        g.setColour(enabled ? Colours::white : Colours::grey);//??adjust
         
         Rectangle<float> r;
         r.setLeft(center.getX() - 2);
@@ -58,7 +60,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
         g.setColour(Colour()); //makes the rectangle background transparent
         g.fillRect(r);
         
-        g.setColour(Colour(192u, 202u, 218u));
+        g.setColour(enabled ? Colour(192u, 202u, 218u) : Colours::grey);//??adjust
         g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
     }
 
@@ -623,6 +625,38 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
     analyzerEnabledButton.setLookAndFeel(&lnf);
+    
+    auto safePtr = juce::Component::SafePointer<SimpleEQAudioProcessorEditor>(this);
+    peakBypassButton.onClick = [safePtr](){
+        if(auto* comp = safePtr.getComponent()){
+            auto bypassed = comp->peakBypassButton.getToggleState();
+            
+            //if bypassed, sliders should not be enabled
+            comp->peakFreqSlider.setEnabled(!bypassed);
+            comp->peakGainSlider.setEnabled(!bypassed);
+            comp->peakQualitySlider.setEnabled(!bypassed);
+        }
+    };
+    
+    lowCutBypassButton.onClick = [safePtr](){
+        if(auto* comp = safePtr.getComponent()){
+            auto bypassed = comp->lowCutBypassButton.getToggleState();
+            
+            //if bypassed, sliders should not be enabled
+            comp->lowCutFreqSlider.setEnabled(!bypassed);
+            comp->lowCutSlopeSlider.setEnabled(!bypassed);
+        }
+    };
+    
+    highCutBypassButton.onClick = [safePtr](){
+        if(auto* comp = safePtr.getComponent()){
+            auto bypassed = comp->highCutBypassButton.getToggleState();
+            
+            //if bypassed, sliders should not be enabled
+            comp->highCutFreqSlider.setEnabled(!bypassed);
+            comp->highCutSlopeSlider.setEnabled(!bypassed);
+        }
+    };
     
     setSize (600, 500);
 }
