@@ -293,11 +293,13 @@ void PathProducer::process(juce::Rectangle<float> fftBounds, double sampleRate){
 
 void ResponseCurveComponent::timerCallback(){
     
-    auto fftBounds = getAnalysisArea().toFloat();
-    auto sampleRate = audioProcessor.getSampleRate();
-    
-    leftPathProducer.process(fftBounds, sampleRate);
-    rightPathProducer.process(fftBounds, sampleRate);
+    if(shouldShowFFTAnalysis){
+        auto fftBounds = getAnalysisArea().toFloat();
+        auto sampleRate = audioProcessor.getSampleRate();
+        
+        leftPathProducer.process(fftBounds, sampleRate);
+        rightPathProducer.process(fftBounds, sampleRate);
+    }
     
     //dont want to always be doing this, only want when we update the curve
     if(parametersChanges.compareAndSetBool(false, true)){
@@ -400,20 +402,22 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
     
-    auto leftChannelFFTPath = leftPathProducer.getPath();
-    
-    //translating the leftChannel path to follow the responseArea
-    leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
-    
-    g.setColour(Colours::skyblue);
-    g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));//???figure this out and why it isn't following the curve, but right is
-    
-    auto rightChannelFFTPath = rightPathProducer.getPath();
-    //translating the rightChannel path to follow the responseArea
-    rightChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
-    
-    g.setColour(Colours::lightyellow);
-    g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
+    if(shouldShowFFTAnalysis){
+        auto leftChannelFFTPath = leftPathProducer.getPath();
+        
+        //translating the leftChannel path to follow the responseArea
+        leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+        
+        g.setColour(Colours::skyblue);
+        g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));//???figure this out and why it isn't following the curve, but right is
+        
+        auto rightChannelFFTPath = rightPathProducer.getPath();
+        //translating the rightChannel path to follow the responseArea
+        rightChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+        
+        g.setColour(Colours::lightyellow);
+        g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
+    }
     
     
     float converter = 0.501961/128;
@@ -655,6 +659,13 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
             //if bypassed, sliders should not be enabled
             comp->highCutFreqSlider.setEnabled(!bypassed);
             comp->highCutSlopeSlider.setEnabled(!bypassed);
+        }
+    };
+    
+    analyzerEnabledButton.onClick = [safePtr]{
+        if(auto* comp = safePtr.getComponent()){
+            auto enabled = comp->analyzerEnabledButton.getToggleState();
+            comp->responseCurveComponent.toggleAnalysisEnablement(enabled);
         }
     };
     

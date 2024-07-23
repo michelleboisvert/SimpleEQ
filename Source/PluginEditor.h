@@ -229,6 +229,10 @@ struct ResponseCurveComponent: juce::Component, juce::AudioProcessorParameter::L
     void paint(juce::Graphics& g) override;
     
     void resized() override;
+    
+    void toggleAnalysisEnablement(bool enabled){
+        shouldShowFFTAnalysis = enabled;
+    }
 
 private:
     SimpleEQAudioProcessor& audioProcessor;
@@ -245,6 +249,8 @@ private:
     juce::Rectangle<int> getAnalysisArea(); //labels for the response curve grid
     
     PathProducer leftPathProducer, rightPathProducer;
+    
+    bool shouldShowFFTAnalysis = true;
 };
 
 //==============================================================================
