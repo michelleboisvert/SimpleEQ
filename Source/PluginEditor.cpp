@@ -67,37 +67,59 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown){
     using namespace juce;
     
-    Path powerButton;
-    
-    auto bounds = toggleButton.getLocalBounds();
-//    g.setColour(Colours::red);
-//    g.drawRect(bounds);
-    
-    auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;//JUCE_LIVE_CONSTANT(6);//can use juce live constant to tweak it
-    auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
-    
-    float ang = 40.f;//JUCE_LIVE_CONSTANT(30);//determines how big top gap is in the arc
-    
-    size -= 8;//JUCE_LIVE_CONSTANT(6);//changes inner arc
-    
-    powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(ang), degreesToRadians(360.f - ang), true);//using ang to adjust how visuals look
-    
-    powerButton.startNewSubPath(r.getCentreX(), r.getY());
-    powerButton.lineTo(r.getCentre());
-    
-    //can use strokePath, but want to use custom stuff so use path constructor
-    PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
-    
-    //now specify color
-    auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(11u, 39u, 91u);
-    //blue is active, gray is off
-    
-    g.setColour(color);
-    g.strokePath(powerButton, pst);
-    
-    g.drawEllipse(r, 2.f);
-    
-    //??? something to fix
+    if(auto*  pb = dynamic_cast<PowerButton*>(&toggleButton)){
+        Path powerButton;
+        
+        auto bounds = toggleButton.getLocalBounds();
+        //    g.setColour(Colours::red);
+        //    g.drawRect(bounds);
+        
+        auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;//JUCE_LIVE_CONSTANT(6);//can use juce live constant to tweak it
+        auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
+        
+        float ang = 40.f;//JUCE_LIVE_CONSTANT(30);//determines how big top gap is in the arc
+        
+        size -= 8;//JUCE_LIVE_CONSTANT(6);//changes inner arc
+        
+        powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(ang), degreesToRadians(360.f - ang), true);//using ang to adjust how visuals look
+        
+        powerButton.startNewSubPath(r.getCentreX(), r.getY());
+        powerButton.lineTo(r.getCentre());
+        
+        //can use strokePath, but want to use custom stuff so use path constructor
+        PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
+        
+        //now specify color
+        auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(11u, 39u, 91u);
+        //blue is active, gray is off
+        
+        g.setColour(color);
+        g.strokePath(powerButton, pst);
+        
+        g.drawEllipse(r, 2.f);
+    }
+    else if(auto* ab = dynamic_cast<AnalyzerButton*>(&toggleButton)){
+        auto color = ! toggleButton.getToggleState() ? Colours::dimgrey : Colour(11u, 39u, 91u);
+        
+        g.setColour(color);
+        
+        auto bounds = toggleButton.getLocalBounds();
+        g.drawRect(bounds);
+        
+        auto insetRect = bounds.reduced(4);
+        
+        Path randomPath;
+        
+        Random r;
+        
+        randomPath.startNewSubPath(insetRect.getX(), insetRect.getY() + insetRect.getHeight() * r.nextFloat());
+        
+        for(auto x  = insetRect.getX() + 1; x < insetRect.getRight(); x += 2){
+            randomPath.lineTo(x, insetRect.getY() + insetRect.getHeight() * r.nextFloat());
+        }
+        
+        g.strokePath(randomPath, PathStrokeType(1.f));
+    }
 }
 
 //==============================================================================
@@ -612,7 +634,7 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
     peakBypassButton.setLookAndFeel(&lnf);
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
-    
+    analyzerEnabledButton.setLookAndFeel(&lnf);
     
     setSize (600, 500);
 }
@@ -623,6 +645,7 @@ SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
     peakBypassButton.setLookAndFeel(nullptr);
     lowCutBypassButton.setLookAndFeel(nullptr);
     highCutBypassButton.setLookAndFeel(nullptr);
+    analyzerEnabledButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -642,6 +665,16 @@ void SimpleEQAudioProcessorEditor::resized()
     
     //JUCE_LIVE_CONSTANT(value) is very helpful
     auto bounds = getLocalBounds();
+    
+    auto analyzerEnabledArea = bounds.removeFromTop(25);
+    analyzerEnabledArea.setWidth(100);
+    analyzerEnabledArea.setX(5);
+    analyzerEnabledArea.removeFromTop(2);
+    
+    analyzerEnabledButton.setBounds(analyzerEnabledArea);
+    bounds.removeFromTop(5);
+    
+     
     float heightRatio = 25.f / 100.f; //JUCE_LIVE_CONSTANT(33) / 100.f;//allows us to adjust so we can see how tall our rectangle for the response curve should be
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * heightRatio);
     
