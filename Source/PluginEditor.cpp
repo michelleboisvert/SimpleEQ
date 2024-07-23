@@ -64,6 +64,43 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 
 }
 
+void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown){
+    using namespace juce;
+    
+    Path powerButton;
+    
+    auto bounds = toggleButton.getLocalBounds();
+//    g.setColour(Colours::red);
+//    g.drawRect(bounds);
+    
+    auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;//can use juce linve constant to tweak it
+    auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
+    
+    float ang = 30.f;
+    
+    size -= 6;
+    
+    powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(30.f), degreesToRadians(360.f - ang), true);//using ang to adjust how visuals look
+    
+    powerButton.startNewSubPath(r.getCentreX(), r.getY());
+    powerButton.lineTo(r.getCentre());
+    
+    //can use strokePath, but want to use custom stuff so use path constructor
+    PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
+    
+    //now specify color
+    auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(11u, 39u, 91u);
+    //blue is active, gray is off
+    
+    g.setColour(color);
+    g.strokePath(powerButton, pst);
+    
+    g.drawEllipse(r, 2.f);
+    
+    //??? something to fix
+}
+
+//==============================================================================
 void RotarySliderWithLabels::paint(juce::Graphics &g){
     using namespace juce;
     
@@ -572,12 +609,20 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
         addAndMakeVisible(comp);
     }
     
+    peakBypassButton.setLookAndFeel(&lnf);
+    lowCutBypassButton.setLookAndFeel(&lnf);
+    highCutBypassButton.setLookAndFeel(&lnf);
+    
+    
     setSize (600, 500);
 }
 
 SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
 {
     //since we registered as a listener we need to deregister as a listener (constructor then destructor)
+    peakBypassButton.setLookAndFeel(nullptr);
+    lowCutBypassButton.setLookAndFeel(nullptr);
+    highCutBypassButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
