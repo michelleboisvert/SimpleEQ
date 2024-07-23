@@ -17,11 +17,11 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
     
     auto enabled = slider.isEnabled();
     
-    g.setColour(enabled ? Colour(62u, 90u, 142u) : Colours::darkgrey);//???adjust
+    g.setColour(enabled ? Colour(232u, 194u, 159u) : Colours::darkgrey);
     g.fillEllipse(bounds);
     
-    g.setColour(enabled ? Colour(11u, 39u, 91u) : Colours::grey);//??adjust
-    g.drawEllipse(bounds, 2.f);
+    g.setColour(enabled ? Colour(255u, 155u, 64u) : Colours::grey);
+    g.drawEllipse(bounds, 3.f);
     
     
     //FIXXXX ??? ??!!! Add under each circle the name of the property that it is changing!!!
@@ -30,7 +30,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
         auto center = bounds.getCentre();
         Path p;
         
-        g.setColour(enabled ? Colours::white : Colours::grey);//??adjust
+        g.setColour(enabled ? Colour(255u, 155u, 64u) : Colours::grey);
         
         Rectangle<float> r;
         r.setLeft(center.getX() - 2);
@@ -60,7 +60,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
         g.setColour(Colour()); //makes the rectangle background transparent
         g.fillRect(r);
         
-        g.setColour(enabled ? Colour(192u, 202u, 218u) : Colours::grey);//??adjust
+        g.setColour(enabled ? Colour(232u, 92u, 26u) : Colours::grey);
         g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
     }
 
@@ -76,7 +76,7 @@ void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggle
         //    g.setColour(Colours::red);
         //    g.drawRect(bounds);
         
-        auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;//JUCE_LIVE_CONSTANT(6);//can use juce live constant to tweak it
+        auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 7;//JUCE_LIVE_CONSTANT(6);//can use juce live constant to tweak it
         auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
         
         float ang = 40.f;//JUCE_LIVE_CONSTANT(30);//determines how big top gap is in the arc
@@ -92,8 +92,8 @@ void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggle
         PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
         
         //now specify color
-        auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(11u, 39u, 91u);
-        //blue is active, gray is off
+        auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(232u, 92u, 26u);
+        //red-orange is active, gray is off
         
         g.setColour(color);
         g.strokePath(powerButton, pst);
@@ -101,7 +101,7 @@ void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggle
         g.drawEllipse(r, 2.f);
     }
     else if(auto* ab = dynamic_cast<AnalyzerButton*>(&toggleButton)){
-        auto color = ! toggleButton.getToggleState() ? Colours::dimgrey : Colour(11u, 39u, 91u);
+        auto color = ! toggleButton.getToggleState() ? Colours::dimgrey : Colour(232u, 194u, 159u);
         
         g.setColour(color);
         
@@ -126,10 +126,15 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
     
     auto sliderBounds = getSliderBounds();
     
-//    g.setColour(Colours::red);
-//    g.drawRect(getLocalBounds());
-//    g.setColour(Colours::yellow);
-//    g.drawRect(sliderBounds);
+    g.setColour(Colours::red);
+    g.drawRect(getLocalBounds());
+    g.setColour(Colours::yellow);
+    g.drawRect(sliderBounds);
+    
+    auto space = getLocalBounds().removeFromBottom(12);
+    auto labelBounds = space.removeFromTop(10);
+    g.setColour(Colours::blue);
+    g.drawRect(labelBounds);
     
     
     getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY(), sliderBounds.getWidth(), sliderBounds.getHeight(), jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), startAngle, endAngle, *this);
@@ -138,7 +143,7 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
     auto center = sliderBounds.toFloat().getCentre();
     auto radius = sliderBounds.getWidth() * 0.5f;
     
-    g.setColour(Colour(11u, 39u, 91u));
+    g.setColour(Colour(255u, 155u, 64u));
     g.setFont(getTextHeight());
     
     auto numChoices = labels.size();
@@ -158,6 +163,17 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
         r.setCentre(c);
         r.setY(r.getY() + getTextHeight());
         
+        g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
+    }
+    
+    //adding parameter labels for each slider
+    g.setColour(Colour(232u, 194u, 159u));
+    g.setFont(9);
+    
+    for(int i = 0; i < parameterLabels.size(); ++i){
+        auto center = labelBounds.toFloat().getCentre();
+        Rectangle<float> r;
+        auto str = parameterLabels[i];
         g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
     }
 }
@@ -408,7 +424,7 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
         //translating the leftChannel path to follow the responseArea
         leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
         
-        g.setColour(Colours::skyblue);
+        g.setColour(Colours::lightcoral);
         g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));//???figure this out and why it isn't following the curve, but right is
         
         auto rightChannelFFTPath = rightPathProducer.getPath();
@@ -419,9 +435,7 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
         g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
     }
     
-    
-    float converter = 0.501961/128;
-    g.setColour(Colour::fromFloatRGBA(converter*94, converter*144, converter*236,  1.0f));
+    g.setColour(Colour(255u, 155u, 64u));
     g.drawRoundedRectangle(getRenderArea().toFloat(), 4.1, 1.f);//thickness of 1 pixel wide
     
     g.setColour(Colours::white);
@@ -476,7 +490,7 @@ void ResponseCurveComponent::resized(){
         auto y = jmap(gDB, -24.f, 24.f, float(bottom), float(top));
         //g.drawHorizontalLine(y, 0.f, getWidth());
         //drawing 0 dB line as a diff color to make it stand out
-        g.setColour(gDB == 0.f ? Colour(62u, 90u, 142u): Colours::darkgrey);
+        g.setColour(gDB == 0.f ? Colour(232u, 194u, 159u): Colours::darkgrey);
         g.drawHorizontalLine(y, float(left), float(right));
     }
     
@@ -529,7 +543,7 @@ void ResponseCurveComponent::resized(){
         else
             r.setX(getWidth() - textWidth);
         r.setCentre(r.getCentreX(), y); //we don't know the y, but we know x and know we want the center of the rect to be lined up with the y value for the corresponding gDB
-        g.setColour(gDB == 0.f ? Colour(62u, 90u, 142u): Colours::lightgrey);
+        g.setColour(gDB == 0.f ? Colour(232u, 194u, 159u): Colours::lightgrey);
         
         g.drawFittedText(str, r, juce::Justification::centred, 1);
         

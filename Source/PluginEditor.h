@@ -184,6 +184,9 @@ private:
     LookAndFeel lnf;
     juce::RangedAudioParameter* param;
     juce::String suffix;
+    juce::Array<juce::String> parameterLabels{
+      "LowCut Freq", "LowCut Slope", "Peak Freq", "Peak Gain", "Peak Quality", "HighCut Freq", "HighCut Slope"
+    };
 };
 
 struct PathProducer{
