@@ -126,15 +126,15 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
     
     auto sliderBounds = getSliderBounds();
     
-    g.setColour(Colours::red);
-    g.drawRect(getLocalBounds());
-    g.setColour(Colours::yellow);
-    g.drawRect(sliderBounds);
+//    g.setColour(Colours::red);
+//    g.drawRect(getLocalBounds());
+//    g.setColour(Colours::yellow);
+//    g.drawRect(sliderBounds);
     
     auto space = getLocalBounds().removeFromBottom(12);
     auto labelBounds = space.removeFromTop(10);
-    g.setColour(Colours::blue);
-    g.drawRect(labelBounds);
+//    g.setColour(Colours::blue);
+//    g.drawRect(labelBounds);
     
     
     getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY(), sliderBounds.getWidth(), sliderBounds.getHeight(), jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), startAngle, endAngle, *this);
@@ -143,7 +143,8 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
     auto center = sliderBounds.toFloat().getCentre();
     auto radius = sliderBounds.getWidth() * 0.5f;
     
-    g.setColour(Colour(255u, 155u, 64u));
+    auto enabled = this->isEnabled();
+    g.setColour(enabled ? Colour(255u, 155u, 64u) : Colours::darkgrey);
     g.setFont(getTextHeight());
     
     auto numChoices = labels.size();
@@ -174,6 +175,9 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
         auto center = labelBounds.toFloat().getCentre();
         Rectangle<float> r;
         auto str = parameterLabels[i];
+        r.setSize(g.getCurrentFont().getStringWidth(str), getTextHeight());
+        r.setCentre(center);
+        r.setY(r.getY() + getTextHeight());
         g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
     }
 }
