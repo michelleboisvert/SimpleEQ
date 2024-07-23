@@ -527,7 +527,12 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
         lowCutFreqSliderAttachment(audioProcessor.apvts, "LowCut Freq", lowCutFreqSlider),
         highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", highCutFreqSlider),
         lowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", lowCutSlopeSlider),
-        highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider)
+        highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider),
+        
+        lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypassButton),
+        peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
+        highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
+        analyzerEnabledButtonAttachment(audioProcessor.apvts, "Analyzer Enabled", analyzerEnabledButton)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -571,7 +576,7 @@ void SimpleEQAudioProcessorEditor::paint (juce::Graphics& g)
     using namespace juce;
     
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (Colours::white);
+    g.fillAll (Colours::black);
     
 }
 
@@ -582,7 +587,7 @@ void SimpleEQAudioProcessorEditor::resized()
     
     //JUCE_LIVE_CONSTANT(value) is very helpful
     auto bounds = getLocalBounds();
-    float heightRatio = 25.f / 100.f; //JUCE_LIVE_CONSTANT(33) / 100.f;//allows us to adjust so we can see how tall our response curve should be
+    float heightRatio = 25.f / 100.f; //JUCE_LIVE_CONSTANT(33) / 100.f;//allows us to adjust so we can see how tall our rectangle for the response curve should be
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * heightRatio);
     
     responseCurveComponent.setBounds(responseArea);
@@ -592,12 +597,15 @@ void SimpleEQAudioProcessorEditor::resized()
     auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
     auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
     
+    lowCutBypassButton.setBounds(lowCutArea.removeFromTop(25));
     lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.5));
     lowCutSlopeSlider.setBounds(lowCutArea);
     
+    highCutBypassButton.setBounds(highCutArea.removeFromTop(25));
     highCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.getHeight() * 0.5));
     highCutSlopeSlider.setBounds(highCutArea);
     
+    peakBypassButton.setBounds(bounds.removeFromTop(25));
     peakFreqSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.33));
     peakGainSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.5));
     peakQualitySlider.setBounds(bounds);
@@ -616,6 +624,11 @@ std::vector<juce::Component*> SimpleEQAudioProcessorEditor::getComps(){
         &highCutFreqSlider,
         &lowCutSlopeSlider,
         &highCutSlopeSlider,
-        &responseCurveComponent
+        &responseCurveComponent,
+        
+        &lowCutBypassButton,
+        &highCutBypassButton,
+        &peakBypassButton,
+        &analyzerEnabledButton
     };
 }
