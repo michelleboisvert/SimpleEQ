@@ -15,6 +15,9 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
     
     auto bounds = Rectangle<float>(x, y, width, height);
     
+//    g.setColour(Colours::red);
+//    g.drawRect(bounds);
+    
     auto enabled = slider.isEnabled();
     
     g.setColour(enabled ? Colour(232u, 194u, 159u) : Colours::darkgrey);
@@ -22,9 +25,6 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
     
     g.setColour(enabled ? Colour(255u, 155u, 64u) : Colours::grey);
     g.drawEllipse(bounds, 3.f);
-    
-    
-    //FIXXXX ??? ??!!! Add under each circle the name of the property that it is changing!!!
     
     if(auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider)){
         auto center = bounds.getCentre();
@@ -131,13 +131,14 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
 //    g.setColour(Colours::yellow);
 //    g.drawRect(sliderBounds);
     
-    auto space = getLocalBounds().removeFromBottom(12);
-    auto labelBounds = space.removeFromTop(10);
+    auto space = getLocalBounds().removeFromBottom(13);
+    auto labelBounds = space.removeFromTop(12);
+    
 //    g.setColour(Colours::blue);
 //    g.drawRect(labelBounds);
     
     
-    getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY(), sliderBounds.getWidth(), sliderBounds.getHeight(), jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), startAngle, endAngle, *this);
+    getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY() + 5, sliderBounds.getWidth(), sliderBounds.getHeight(), jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), startAngle, endAngle, *this);
     //jmap maps from slider values to reg values
     
     auto center = sliderBounds.toFloat().getCentre();
@@ -156,7 +157,7 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
         auto ang = jmap(pos, 0.f, 1.f, startAngle, endAngle);
         
         //center point
-        auto c = center.getPointOnCircumference(radius + getTextHeight() * 0.5f + 1, ang);
+        auto c = center.getPointOnCircumference(radius + getTextHeight() * 0.5f + 4, ang);
         
         Rectangle<float> r;
         auto str = labels[i].label;
@@ -168,18 +169,18 @@ void RotarySliderWithLabels::paint(juce::Graphics &g){
     }
     
     //adding parameter labels for each slider
-    g.setColour(Colour(232u, 194u, 159u));
-    g.setFont(9);
+    g.setColour(enabled ? Colour(232u, 194u, 159u) : Colours::grey);
+    g.setFont(10);
     
-    for(int i = 0; i < parameterLabels.size(); ++i){
-        auto center = labelBounds.toFloat().getCentre();
-        Rectangle<float> r;
-        auto str = parameterLabels[i];
-        r.setSize(g.getCurrentFont().getStringWidth(str), getTextHeight());
-        r.setCentre(center);
-        r.setY(r.getY() + getTextHeight());
-        g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
-    }
+    auto lblcenter = labelBounds.toFloat().getCentre();
+    
+    Rectangle<float> r;
+    auto str = param->getParameterID();
+    //DBG(str);
+    
+    r.setSize(g.getCurrentFont().getStringWidth(str), 10);
+    r.setCentre(lblcenter);
+    g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
 }
 
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const{

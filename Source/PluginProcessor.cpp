@@ -324,8 +324,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout SimpleEQAudioProcessor::crea
     
     //human hearing range: 20 hz to 20,000 hz
     //we are making different bands here
-    //2 cut bands and a parametric band 
-    
+    //2 cut bands and a parametric band
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"LowCut Freq", 1},
                                                            "LowCut Freq",
                                                            juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 0.25f),
