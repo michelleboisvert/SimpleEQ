@@ -122,7 +122,7 @@ void SimpleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
     
     spec.numChannels = getTotalNumOutputChannels();
     osc.prepare(spec);
-    osc.setFrequency(100);//this value changes based on the frequency we want to test -> 200, 1000, 5000, 50, 100
+    osc.setFrequency(5000);//this value changes based on the frequency we want to test -> 200, 1000, 5000, 50, 100
 }
 
 void SimpleEQAudioProcessor::releaseResources()

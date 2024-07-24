@@ -288,7 +288,6 @@ void PathProducer::process(juce::Rectangle<float> fftBounds, double sampleRate){
         if we can pull a buffer
             generate a path
      */
-    //const auto fftBounds = getAnalysisArea().toFloat();
     const auto fftSize =  leftChannelFFTDataGenerator.getFFTSize();
     /*
      48000 / 2048 = 23hz <- this is the bin width
@@ -316,6 +315,7 @@ void ResponseCurveComponent::timerCallback(){
     
     if(shouldShowFFTAnalysis){
         auto fftBounds = getAnalysisArea().toFloat();
+        //fftBounds.removeFromRight(JUCE_LIVE_CONSTANT(14));
         auto sampleRate = audioProcessor.getSampleRate();
         
         leftPathProducer.process(fftBounds, sampleRate);
@@ -364,6 +364,11 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
     g.drawImage(background, getLocalBounds().toFloat());
     
     auto responseArea = getAnalysisArea();
+//    g.setColour(Colours::red);
+//    g.drawRect(responseArea);
+    auto removePathArea = Rectangle<int>(responseArea.getRight() + 1, responseArea.getTopRight().getY(), 20, responseArea.getHeight() + 5);
+//    g.setColour(Colours::yellow);
+//    g.drawRect(removePathArea);
     
     auto w = responseArea.getWidth();
     
@@ -424,6 +429,8 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
     }
     
     if(shouldShowFFTAnalysis){
+        g.excludeClipRegion(removePathArea);//eliminates extra part of path
+        
         auto leftChannelFFTPath = leftPathProducer.getPath();
         
         //translating the leftChannel path to follow the responseArea
@@ -749,10 +756,6 @@ void SimpleEQAudioProcessorEditor::resized()
     peakFreqSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.33));
     peakGainSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.5));
     peakQualitySlider.setBounds(bounds);
-    
-    //peakFreqSlider.setColour(peakFreqSlider.getComponentID(), juce::Colour::fromFloatRGBA(1.0f, 1.0f, 1.0f, 1.0f)); figure out!!!!
-    //Colour::fromFloatRGBA(converter*94, converter*144, converter*236, 1.0f)());
-    //customize plugin once done!!??!!!
 }
 
 std::vector<juce::Component*> SimpleEQAudioProcessorEditor::getComps(){
