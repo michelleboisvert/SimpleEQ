@@ -73,8 +73,8 @@ void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggle
         Path powerButton;
         
         auto bounds = toggleButton.getLocalBounds();
-        //    g.setColour(Colours::red);
-        //    g.drawRect(bounds);
+//            g.setColour(Colours::red);
+//            g.drawRect(bounds);
         
         auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 7;//JUCE_LIVE_CONSTANT(6);//can use juce live constant to tweak it
         auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
@@ -99,6 +99,11 @@ void LookAndFeel::drawToggleButton(juce::Graphics &g, juce::ToggleButton &toggle
         g.strokePath(powerButton, pst);
         
         g.drawEllipse(r, 2.f);
+        
+        auto temp = Rectangle<int>(int(r.getX()), int(r.getY()), int(r.getWidth()), int(r.getHeight()));
+        setToggleArea(temp);
+//        g.setColour(Colours::lightgreen);
+//        g.drawRect(temp);
     }
     else if(auto* ab = dynamic_cast<AnalyzerButton*>(&toggleButton)){
         auto color = ! toggleButton.getToggleState() ? Colours::dimgrey : Colour(232u, 194u, 159u);
@@ -435,7 +440,7 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
         leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
         
         g.setColour(Colours::lightcoral);
-        g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));//???figure this out and why it isn't following the curve, but right is
+        g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
         
         auto rightChannelFFTPath = rightPathProducer.getPath();
         //translating the rightChannel path to follow the responseArea
@@ -654,15 +659,28 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
     highCutBypassButton.setLookAndFeel(&lnf);
     analyzerEnabledButton.setLookAndFeel(&lnf);
     
+    //making it so that only the region with the button is clicked
     auto safePtr = juce::Component::SafePointer<SimpleEQAudioProcessorEditor>(this);
-    peakBypassButton.onClick = [safePtr](){
+    peakBypassButton.onClick = [safePtr, this](){
         if(auto* comp = safePtr.getComponent()){
+            //peakBypassButton.setToggle
             auto bypassed = comp->peakBypassButton.getToggleState();
+            //bool inArea = comp->hitTest(getMouseXYRelative().getX(), getMouseXYRelative().getY());
+            //if(inArea)
+                //peakBypassButton.setToggleState(!bypassed, juce::NotificationType::dontSendNotification);
             
+            //&& bypassed == false)
+            //DBG("clicked");
             //if bypassed, sliders should not be enabled
             comp->peakFreqSlider.setEnabled(!bypassed);
             comp->peakGainSlider.setEnabled(!bypassed);
             comp->peakQualitySlider.setEnabled(!bypassed);
+            
+            /*else{
+                comp->peakFreqSlider.setEnabled(true);
+                comp->peakGainSlider.setEnabled(true);
+                comp->peakQualitySlider.setEnabled(true);
+            }*/
         }
     };
     
@@ -773,3 +791,24 @@ std::vector<juce::Component*> SimpleEQAudioProcessorEditor::getComps(){
         &analyzerEnabledButton
     };
 }
+
+/*bool SimpleEQAudioProcessorEditor::hitTest(int x, int y) {
+//    DBG(getX());
+//    DBG(getY());
+//    DBG(x);
+//    DBG(y);
+    
+    auto buttonArea = lnf.getToggleArea();
+
+//    DBG(buttonArea.getX());
+//    DBG(buttonArea.getY());
+    if(289 <= x && x <= 307 && 154 <= y && y <= 173){
+        DBG("yay");
+        return true;
+    }
+    else{
+        DBG("no!");
+        return false;
+    }
+    //return true;
+}*/

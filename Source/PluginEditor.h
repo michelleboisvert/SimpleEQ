@@ -150,6 +150,15 @@ struct LookAndFeel : juce::LookAndFeel_V4
     void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider) override;
     
     void drawToggleButton (juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+    
+    juce::Rectangle<int> getToggleArea(){
+        return toggleButtonArea;
+    }
+    void setToggleArea(juce::Rectangle<int> myRect){
+        toggleButtonArea = myRect;
+    }
+private:
+    juce::Rectangle<int> toggleButtonArea;
 };
 
 struct RotarySliderWithLabels : juce::Slider
@@ -287,6 +296,8 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    
+    //bool hitTest(int x, int y) override;
 
 private:
     // This reference is provided as a quick way for your editor to
