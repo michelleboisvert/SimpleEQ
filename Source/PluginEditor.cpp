@@ -232,14 +232,12 @@ juce::String RotarySliderWithLabels::getDisplayString() const{
 }
 
 //==============================================================================
-ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p), leftPathProducer(audioProcessor.leftChannelFifo), rightPathProducer(audioProcessor.rightChannelFifo){ //leftChannelFifo(&audioProcessor.leftChannelFifo){
+ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p), leftPathProducer(audioProcessor.leftChannelFifo), rightPathProducer(audioProcessor.rightChannelFifo){
     const auto& params = audioProcessor.getParameters();
     for(auto param : params){
         param->addListener(this);
     }
-    
-    
-    
+ 
     //this will update the gui whenever we close and reopen it
     updateChain();
     

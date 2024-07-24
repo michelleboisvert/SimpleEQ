@@ -186,10 +186,9 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 //    osc.process(stereoContext); //plays and shows a sine wave
     
     
-    auto leftBlock = block.getSingleChannelBlock(0);
-    auto rightBlock = block.getSingleChannelBlock(0);//should it be 1   ? instead??
-    //convention of left = 0, right = 1
-    rightBlock.copyFrom(leftBlock);//?? is this line necessary?
+    auto leftBlock = block.getSingleChannelBlock(1);
+    auto rightBlock = block.getSingleChannelBlock(0);
+    //convention of left = 1, right = 0
     
     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
